@@ -37,10 +37,10 @@ export default function DashboardPage() {
     .all(couple.id) as { t: string; c: number }[];
   const top = tags[0];
   const tagColor: Record<string, string> = {
-    happy: "bg-amber-200 text-amber-900 border border-amber-300",
+    happy: "bg-amber-100 text-amber-700 border border-amber-200",
     flutter: "bg-fuchsia-200 text-fuchsia-900 border border-fuchsia-300",
     calm: "bg-emerald-100 text-emerald-700 border border-emerald-200",
-    special: "bg-amber-100 text-amber-700 border border-amber-200",
+    special: "bg-sky-100 text-sky-700 border border-sky-200",
     regret: "bg-slate-100 text-slate-700 border border-slate-200",
   };
 
