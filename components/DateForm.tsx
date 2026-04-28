@@ -201,7 +201,7 @@ export default function DateForm({ initial }: { initial?: Initial }) {
           <input
             className="hidden"
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/webp,image/gif,image/avif"
             multiple
             onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
           />
