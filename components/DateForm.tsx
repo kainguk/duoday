@@ -33,6 +33,15 @@ export default function DateForm({ initial }: { initial?: Initial }) {
   );
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const [newFilePreviews, setNewFilePreviews] = useState<{ name: string; url: string }[]>([]);
+
+  useEffect(() => {
+    const previews = files.map((f) => ({ name: f.name, url: URL.createObjectURL(f) }));
+    setNewFilePreviews(previews);
+    return () => {
+      previews.forEach((p) => URL.revokeObjectURL(p.url));
+    };
+  }, [files]);
 
   useEffect(() => {
     const hasExisting = existingPhotos.some((p) => !removeIds.includes(p.id));
@@ -274,18 +283,29 @@ export default function DateForm({ initial }: { initial?: Initial }) {
               <ul className="space-y-1">
                 {files.map((f, idx) => {
                   const isPrimary = primaryPhotoRef === `new:${idx}`;
+                  const preview = newFilePreviews[idx]?.url;
                   return (
                     <li key={`${f.name}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
-                      <span className="truncate text-blossom-700">{f.name}</span>
-                      <button
-                        type="button"
-                        onClick={() => setPrimaryPhotoRef(`new:${idx}`)}
-                        className={`rounded-full px-2 py-0.5 ${
-                          isPrimary ? "bg-blossom-500 text-white" : "bg-white text-blossom-700 border border-blossom-200"
-                        }`}
-                      >
-                        대표
-                      </button>
+                      <div className="flex items-center gap-2 min-w-0">
+                        {preview ? (
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img src={preview} alt={f.name} className="w-10 h-10 object-cover rounded-md shrink-0" />
+                        ) : (
+                          <div className="w-10 h-10 rounded-md bg-blossom-100 shrink-0" />
+                        )}
+                        <span className="truncate text-blossom-700">{f.name}</span>
+                      </div>
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          type="button"
+                          onClick={() => setPrimaryPhotoRef(`new:${idx}`)}
+                          className={`rounded-full px-2 py-0.5 ${
+                            isPrimary ? "bg-blossom-500 text-white" : "bg-white text-blossom-700 border border-blossom-200"
+                          }`}
+                        >
+                          대표
+                        </button>
+                      </div>
                     </li>
                   );
                 })}
