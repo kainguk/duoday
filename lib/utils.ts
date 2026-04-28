@@ -20,10 +20,15 @@ export function fmtDateWithWeekday(iso: string): string {
 }
 
 export function fmtInputDateWithWeekday(iso: string): string {
-  const d = parseIsoLikeDate(iso);
+  const clean = normalizeDateInput(iso);
+  const d = parseIsoLikeDate(clean);
   if (Number.isNaN(d.getTime())) return iso;
   const w = WEEKDAYS_KO[d.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6] ?? "?";
-  return `${iso} (${w})`;
+  return `${clean}(${w})`;
+}
+
+export function normalizeDateInput(value: string): string {
+  return (value.match(/\d{4}-\d{2}-\d{2}/)?.[0] ?? value).trim();
 }
 
 function parseIsoLikeDate(iso: string): Date {

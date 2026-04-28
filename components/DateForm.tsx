@@ -1,8 +1,8 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EMOTION_TAGS } from "@/lib/emotions";
-import { todayISO, fmtInputDateWithWeekday, toPublicImagePath } from "@/lib/utils";
+import { todayISO, fmtInputDateWithWeekday, normalizeDateInput, toPublicImagePath } from "@/lib/utils";
 
 type Initial = {
   id?: number;
@@ -17,8 +17,9 @@ type Initial = {
 
 export default function DateForm({ initial }: { initial?: Initial }) {
   const r = useRouter();
+  const datePickerRef = useRef<HTMLInputElement>(null);
   const editing = !!initial?.id;
-  const [date, setDate] = useState(initial?.date ?? todayISO());
+  const [date, setDate] = useState(normalizeDateInput(initial?.date ?? todayISO()));
   const [place, setPlace] = useState(initial?.place ?? "");
   const [title, setTitle] = useState(initial?.title ?? "");
   const [feeling, setFeeling] = useState(initial?.feeling ?? "");
@@ -64,14 +65,34 @@ export default function DateForm({ initial }: { initial?: Initial }) {
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className="label">날짜</label>
-          <input
-            className="input"
-            type="date"
-            required
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-          />
-          <p className="mt-1 text-xs text-blossom-500">{fmtInputDateWithWeekday(date)}</p>
+          <div className="relative">
+            <input
+              className="input pr-11"
+              type="text"
+              readOnly
+              value={fmtInputDateWithWeekday(date)}
+              aria-label="선택된 날짜"
+            />
+            <input
+              ref={datePickerRef}
+              className="sr-only"
+              type="date"
+              required
+              value={date}
+              onChange={(e) => setDate(normalizeDateInput(e.target.value))}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 btn-ghost px-2 py-1"
+              onClick={() => {
+                if (datePickerRef.current?.showPicker) datePickerRef.current.showPicker();
+                else datePickerRef.current?.click();
+              }}
+              aria-label="날짜 선택"
+            >
+              📅
+            </button>
+          </div>
         </div>
         <div>
           <label className="label">장소</label>
