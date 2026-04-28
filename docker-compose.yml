@@ -1,0 +1,21 @@
+services:
+  app:
+    build: .
+    container_name: duoday
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - DB_PATH=/app/data/duoday.db
+      - UPLOAD_DIR=/app/public/uploads
+    volumes:
+      - duoday-db:/app/data
+      - duoday-uploads:/app/public/uploads
+    restart: unless-stopped
+
+volumes:
+  duoday-db:
+  duoday-uploads:

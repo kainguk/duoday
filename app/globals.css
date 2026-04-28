@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=Pretendard:wght@400;500;600;700&display=swap");
+
+:root { --bg: #fff7fa; }
+html, body { background: var(--bg); color: #3a1f2b; }
+body { font-family: var(--font-sans, "Pretendard"), system-ui, sans-serif; }
+
+.h-display { font-family: "Gowun Batang", serif; letter-spacing: -0.01em; }
+
+.card { @apply bg-white/80 backdrop-blur rounded-2xl border border-blossom-100 shadow-soft; }
+.btn  { @apply inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-full font-medium transition active:scale-[.98]; }
+.btn-primary { @apply btn bg-blossom-500 text-white hover:bg-blossom-600 disabled:opacity-50; }
+.btn-ghost   { @apply btn bg-blossom-50 text-blossom-700 hover:bg-blossom-100 disabled:opacity-50; }
+.input { @apply w-full rounded-xl border border-blossom-200 bg-white/90 px-4 py-2.5 outline-none focus:border-blossom-400 focus:ring-2 focus:ring-blossom-200; }
+.label { @apply text-sm font-medium text-blossom-800 mb-1.5 block; }
+.chip  { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium; }
+
+/* Timeline rail */
+.timeline-rail {
+  @apply absolute left-[14px] sm:left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-blossom-200 via-blossom-300 to-transparent;
+}
+.timeline-dot {
+  @apply absolute left-0 top-1.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-blossom-300
+         flex items-center justify-center text-blossom-500 text-xs font-semibold shadow-sm;
+}
