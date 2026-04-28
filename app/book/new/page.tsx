@@ -17,9 +17,9 @@ export default function NewBookPage() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="space-y-0">
+    <div className="max-w-2xl mx-auto">
       <h1 className="h-display text-3xl text-blossom-800 mb-2">새 책 주문</h1>
-      <p className="text-blossom-500 mb-6">
+      <p className="text-blossom-500 text-sm mb-6">
         선택한 기간의 질문 답변과 데이트 기록이 한 권으로 묶입니다. <br className="hidden sm:block" />
         주문 전에 <span className="text-blossom-700 font-medium">📖 미리보기</span>로 표지/내지/마지막 페이지를 확인할 수 있어요.
       </p>

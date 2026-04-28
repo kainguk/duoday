@@ -1,7 +1,7 @@
 "use client";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { fmtDateWithWeekday } from "@/lib/utils";
+import { fmtInputDateWithWeekday, normalizeDateInput } from "@/lib/utils";
 
 export default function BookForm({
   defaultStart,
@@ -11,10 +11,12 @@ export default function BookForm({
   defaultEnd: string;
 }) {
   const r = useRouter();
+  const startPickerRef = useRef<HTMLInputElement>(null);
+  const endPickerRef = useRef<HTMLInputElement>(null);
   const [title, setTitle] = useState("우리의 기록");
   const [color, setColor] = useState("#e35c8a");
-  const [start, setStart] = useState(defaultStart);
-  const [end, setEnd] = useState(defaultEnd);
+  const [start, setStart] = useState(normalizeDateInput(defaultStart));
+  const [end, setEnd] = useState(normalizeDateInput(defaultEnd));
   const [iq, setIq] = useState(true);
   const [id, setId] = useState(true);
   const [note, setNote] = useState("");
@@ -114,13 +116,53 @@ export default function BookForm({
       <div className="grid sm:grid-cols-2 gap-4">
         <div>
           <label className="label">시작일</label>
-          <input className="input" type="date" required value={start} onChange={(e) => setStart(e.target.value)} />
-          <p className="mt-1 text-xs text-blossom-500">{fmtDateWithWeekday(start)}</p>
+          <div className="relative">
+            <input className="input pr-11" type="text" readOnly value={fmtInputDateWithWeekday(start)} />
+            <input
+              ref={startPickerRef}
+              className="sr-only"
+              type="date"
+              required
+              value={start}
+              onChange={(e) => setStart(normalizeDateInput(e.target.value))}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 btn-ghost px-2 py-1"
+              onClick={() => {
+                if (startPickerRef.current?.showPicker) startPickerRef.current.showPicker();
+                else startPickerRef.current?.click();
+              }}
+              aria-label="시작일 선택"
+            >
+              📅
+            </button>
+          </div>
         </div>
         <div>
           <label className="label">종료일</label>
-          <input className="input" type="date" required value={end} onChange={(e) => setEnd(e.target.value)} />
-          <p className="mt-1 text-xs text-blossom-500">{fmtDateWithWeekday(end)}</p>
+          <div className="relative">
+            <input className="input pr-11" type="text" readOnly value={fmtInputDateWithWeekday(end)} />
+            <input
+              ref={endPickerRef}
+              className="sr-only"
+              type="date"
+              required
+              value={end}
+              onChange={(e) => setEnd(normalizeDateInput(e.target.value))}
+            />
+            <button
+              type="button"
+              className="absolute right-2 top-1/2 -translate-y-1/2 btn-ghost px-2 py-1"
+              onClick={() => {
+                if (endPickerRef.current?.showPicker) endPickerRef.current.showPicker();
+                else endPickerRef.current?.click();
+              }}
+              aria-label="종료일 선택"
+            >
+              📅
+            </button>
+          </div>
         </div>
       </div>
 
@@ -154,6 +196,9 @@ export default function BookForm({
         </button>
         <button className="btn-primary" disabled={busy}>
           {busy ? "주문 중…" : "주문 만들기"}
+        </button>
+        <button type="button" className="btn-ghost" onClick={() => r.push("/book")}>
+          취소
         </button>
       </div>
     </form>

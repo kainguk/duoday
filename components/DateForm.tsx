@@ -318,11 +318,11 @@ export default function DateForm({ initial }: { initial?: Initial }) {
       {err && <p className="text-sm text-red-500">{err}</p>}
 
       <div className="flex flex-wrap gap-2 justify-end">
-        <button type="button" className="btn-ghost" onClick={() => r.back()}>
-          취소
-        </button>
         <button className="btn-primary" disabled={busy}>
           {busy ? "저장 중…" : editing ? "수정 저장" : "기록 저장"}
+        </button>
+        <button type="button" className="btn-ghost" onClick={() => r.back()}>
+          취소
         </button>
       </div>
     </form>
