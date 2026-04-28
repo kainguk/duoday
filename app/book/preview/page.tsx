@@ -57,6 +57,9 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
     : [];
 
   const totalRecords = dates.length + questions.length;
+  const aWithAnd = withJosa(couple.partner_a, "과", "와");
+  const bWithSubject = withJosa(couple.partner_b, "이", "가");
+  const questionChunks = chunkArray(questions, 6);
 
   return (
     <div className="space-y-6">
@@ -72,7 +75,7 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
         {/* COVER */}
         <Page label="표지">
           <div
-            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft text-white p-8 sm:p-14"
+            className="w-full h-full rounded-xl shadow-soft text-white p-8 sm:p-14"
             style={{ background: cover_color }}
           >
             <div className="h-full grid sm:grid-cols-2 items-center">
@@ -104,24 +107,24 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
                 <DatePage row={d} />
               </Page>
             ))}
-            {questions.length > 0 && (
-              <Page label={`내지 ${dates.length + 1} · 질문 답변 모음`}>
-                <QuestionsPage items={questions} aName={couple.partner_a} bName={couple.partner_b} />
+            {questionChunks.map((chunk, i) => (
+              <Page key={`q-${i}`} label={`내지 ${dates.length + i + 1} · 질문 답변 모음`}>
+                <QuestionsPage items={chunk} aName={couple.partner_a} bName={couple.partner_b} />
               </Page>
-            )}
+            ))}
           </>
         )}
 
         {/* CLOSING */}
         <Page label="마지막 페이지">
           <div
-            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft bg-white border border-blossom-100 p-8 sm:p-14"
+            className="w-full h-full rounded-xl shadow-soft bg-white border border-blossom-100 p-8 sm:p-14"
           >
             <div className="h-full grid sm:grid-cols-2 items-center">
               <div className="text-center sm:text-left sm:pr-10">
                 <p className="h-display text-2xl sm:text-3xl text-blossom-800 mb-3">고마운 날들</p>
                 <p className="text-ink/70 text-sm sm:text-base">
-                  {couple.partner_a}과 {couple.partner_b}이 함께한 {fmtDateWithWeekday(start).replace(" ", "")}부터
+                  {aWithAnd} {bWithSubject} 함께한 {fmtDateWithWeekday(start).replace(" ", "")}부터
                   <br />
                   {fmtDateWithWeekday(end).replace(" ", "")}까지의 이야기를
                   <br />
@@ -139,11 +142,21 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
   );
 }
 
+function withJosa(word: string, josaBatchim: string, josaNoBatchim: string) {
+  const w = word.trim();
+  if (!w) return word;
+  const last = w.charCodeAt(w.length - 1);
+  const isHangul = last >= 0xac00 && last <= 0xd7a3;
+  if (!isHangul) return `${w}${josaNoBatchim}`;
+  const hasBatchim = (last - 0xac00) % 28 !== 0;
+  return `${w}${hasBatchim ? josaBatchim : josaNoBatchim}`;
+}
+
 function Page({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section>
       <p className="text-xs text-blossom-500 mb-2 ml-1">{label}</p>
-      <div className="card overflow-hidden book-spread">{children}</div>
+      <div className="card overflow-hidden book-spread aspect-[3/4] sm:aspect-[3/2]">{children}</div>
     </section>
   );
 }
@@ -164,7 +177,7 @@ function DatePage({
 }) {
   const photo = getPrimaryPhoto(row);
   return (
-    <div className="grid sm:grid-cols-2 gap-0">
+    <div className="grid sm:grid-cols-2 gap-0 h-full">
       <div className="aspect-[4/3] sm:aspect-auto sm:min-h-[260px] relative">
         <div className="absolute inset-0">
           {photo ? (
@@ -176,15 +189,17 @@ function DatePage({
         </div>
         {row.is_best ? <div className="absolute top-3 left-3"><BestBadge /></div> : null}
       </div>
-      <div className="p-6 sm:py-8 sm:pl-10 sm:pr-8">
-        <div className="flex flex-wrap items-center gap-2 text-xs text-blossom-500 mb-2">
-          <span>{fmtDateWithWeekday(row.date)}</span>
-          <span aria-hidden>·</span>
-          <span>{row.place}</span>
-          <EmotionBadge tag={row.emotion_tag} />
+      <div className="p-6 sm:py-8 sm:pl-10 sm:pr-8 flex flex-col justify-center items-center text-center">
+        <div className="w-full max-w-md">
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-blossom-500 mb-2">
+            <span>{fmtDateWithWeekday(row.date)}</span>
+            <span aria-hidden>·</span>
+            <span>{row.place}</span>
+            <EmotionBadge tag={row.emotion_tag} />
+          </div>
+          <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-3">{row.title}</h3>
+          <p className="text-ink/85 text-sm leading-relaxed whitespace-pre-wrap">{row.feeling}</p>
         </div>
-        <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-3">{row.title}</h3>
-        <p className="text-ink/85 text-sm leading-relaxed whitespace-pre-wrap">{row.feeling}</p>
       </div>
     </div>
   );
@@ -234,7 +249,7 @@ function QuestionsPage({
   }
 
   return (
-    <div className="p-6 sm:p-8 h-full grid sm:grid-cols-2 items-start">
+    <div className="p-6 sm:p-8 h-full grid sm:grid-cols-2 items-start overflow-hidden">
       <div className="sm:pr-10">
         <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-4">우리의 질문 답변</h3>
         {renderQuestionList(leftItems)}
@@ -245,4 +260,12 @@ function QuestionsPage({
       </div>
     </div>
   );
+}
+
+function chunkArray<T>(arr: T[], size: number): T[][]
+{
+  if (size <= 0) return [arr];
+  const out: T[][] = [];
+  for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
+  return out;
 }
