@@ -32,11 +32,6 @@ export default function TodayPage({ searchParams }: { searchParams: SP }) {
             오늘의 질문에 답하고, 지난 질문 기록도 수정해요.
           </p>
         </div>
-        {loginMode && actor ? (
-          <a href="/today" className="btn-ghost whitespace-nowrap self-start sm:self-auto">로그아웃</a>
-        ) : (
-          <a href="/today/login" className="btn-primary whitespace-nowrap self-start sm:self-auto">로그인</a>
-        )}
       </div>
 
       <div className="card p-6 md:p-8">

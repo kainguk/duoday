@@ -8,12 +8,16 @@ export default function AnswerForm({
   initial,
   actor,
   disabled = false,
+  onSaved,
+  onDeleted,
 }: {
   dqId: number;
   author: "a" | "b";
   initial: string;
   actor?: "a" | "b";
   disabled?: boolean;
+  onSaved?: () => void;
+  onDeleted?: () => void;
 }) {
   const r = useRouter();
   const [body, setBody] = useState(initial);
@@ -30,6 +34,7 @@ export default function AnswerForm({
     });
     setBusy(false);
     if (res.ok) {
+      onSaved?.();
       r.refresh();
     } else {
       alert("저장 실패");
@@ -47,6 +52,7 @@ export default function AnswerForm({
     setBusy(false);
     if (res.ok) {
       setBody("");
+      onDeleted?.();
       r.refresh();
     } else {
       alert("삭제 실패");

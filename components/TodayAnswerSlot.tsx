@@ -23,8 +23,9 @@ export default function TodayAnswerSlot({
   const mine = answers.find((x) => x.author === author);
   const myOwnAnswer = actor ? answers.find((x) => x.author === actor) : undefined;
   const isMine = actor === author;
+  const canEdit = !loginMode || isMine;
   const canView = !loginMode || !actor || isMine || !!myOwnAnswer;
-  const [editing, setEditing] = useState(!mine?.body && (!loginMode || isMine));
+  const [editing, setEditing] = useState(false);
 
   return (
     <div className="rounded-2xl border border-blossom-100 p-5 bg-white space-y-2">
@@ -32,7 +33,7 @@ export default function TodayAnswerSlot({
 
       {!canView ? (
         <p className="text-sm text-blossom-500">내 답변을 먼저 작성하면 상대 답변을 볼 수 있어요.</p>
-      ) : loginMode ? (
+      ) : (
         <>
           {mine?.body ? (
             <p className="text-sm text-ink/80 whitespace-pre-wrap bg-blossom-50 rounded-xl p-3">{mine.body}</p>
@@ -40,9 +41,16 @@ export default function TodayAnswerSlot({
             <p className="text-sm text-blossom-500">아직 답변이 적혀있지 않아요.</p>
           )}
 
-          {isMine ? (
+          {canEdit ? (
             editing ? (
-              <AnswerForm dqId={dqId} author={author} actor={actor} initial={mine?.body ?? ""} />
+              <AnswerForm
+                dqId={dqId}
+                author={author}
+                actor={actor}
+                initial={mine?.body ?? ""}
+                onSaved={() => setEditing(false)}
+                onDeleted={() => setEditing(false)}
+              />
             ) : (
               <div className="flex justify-end">
                 <button type="button" className="btn-ghost" onClick={() => setEditing(true)}>
@@ -52,8 +60,6 @@ export default function TodayAnswerSlot({
             )
           ) : null}
         </>
-      ) : (
-        <AnswerForm dqId={dqId} author={author} actor={actor} initial={mine?.body ?? ""} />
       )}
     </div>
   );
