@@ -45,9 +45,16 @@ export default function TopNav() {
         );
       })}
       {loggedIn ? (
-        <Link href="/logout" className="btn-ghost ml-3 px-2 py-1.5 sm:px-3 sm:py-2">
+        <a
+          href="/api/logout"
+          className="btn-ghost ml-3 px-2 py-1.5 sm:px-3 sm:py-2"
+          onClick={() => {
+            sessionStorage.removeItem("duoday_session");
+            setLoggedIn(false);
+          }}
+        >
           로그아웃
-        </Link>
+        </a>
       ) : (
         <Link href="/today/login" className="btn-primary ml-3 px-2 py-1.5 sm:px-3 sm:py-2">
           로그인

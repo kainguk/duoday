@@ -123,17 +123,11 @@ function AuthPanel({
       {!loginMode || !actor ? (
         <div>
           <p>현재 비로그인 모드예요. 기본 모드에서도 답변 작성/수정이 가능해요.</p>
-          <p className="text-xs mt-1">
-            로그인 테스트 계정: 지원(ID: aaaa / PW: 1234), 도윤(ID: bbbb / PW: 1234)
-          </p>
         </div>
       ) : (
         <div>
           <p>
             로그인 상태: {actor === "a" ? aName : bName}
-          </p>
-          <p className="text-xs mt-1">
-            로그인 테스트 계정: 지원(ID: aaaa / PW: 1234), 도윤(ID: bbbb / PW: 1234)
           </p>
         </div>
       )}

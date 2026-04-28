@@ -20,13 +20,13 @@ export default function TodayLoginPage() {
     if (uid === "aaaa") {
       document.cookie = "duoday_actor=a; path=/; SameSite=Lax";
       sessionStorage.setItem("duoday_session", "1");
-      r.push("/today");
+      window.location.assign("/today");
       return;
     }
     if (uid === "bbbb") {
       document.cookie = "duoday_actor=b; path=/; SameSite=Lax";
       sessionStorage.setItem("duoday_session", "1");
-      r.push("/today");
+      window.location.assign("/today");
       return;
     }
     setErr("아이디가 올바르지 않아요.");
@@ -37,7 +37,7 @@ export default function TodayLoginPage() {
       <div>
         <h1 className="h-display text-3xl text-blossom-800">로그인 모드</h1>
         <p className="text-sm text-blossom-500 mt-1">
-          테스트 계정: 지원(`aaaa`/`1234`), 도윤(`bbbb`/`1234`)
+          테스트 계정: 지원(ID: aaaa/PW: 1234), 도윤(ID: bbbb/PW: 1234)
         </p>
       </div>
       <div className="card p-6">
