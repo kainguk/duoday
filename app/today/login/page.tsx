@@ -18,11 +18,13 @@ export default function TodayLoginPage() {
       return;
     }
     if (uid === "aaaa") {
-      r.push("/today?login=1&actor=a");
+      document.cookie = "duoday_actor=a; path=/; max-age=2592000; SameSite=Lax";
+      r.push("/today");
       return;
     }
     if (uid === "bbbb") {
-      r.push("/today?login=1&actor=b");
+      document.cookie = "duoday_actor=b; path=/; max-age=2592000; SameSite=Lax";
+      r.push("/today");
       return;
     }
     setErr("아이디가 올바르지 않아요.");

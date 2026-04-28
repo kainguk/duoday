@@ -2,6 +2,7 @@ import { getActiveCouple, getOrAssignTodayQuestion, getAnswers } from "@/lib/rep
 import { todayISO, fmtDate } from "@/lib/utils";
 import { db } from "@/lib/db";
 import TodayAnswerSlot from "@/components/TodayAnswerSlot";
+import { cookies } from "next/headers";
 
 export const dynamic = "force-dynamic";
 
@@ -10,8 +11,9 @@ type SP = { login?: string; actor?: string };
 export default function TodayPage({ searchParams }: { searchParams: SP }) {
   const couple = getActiveCouple();
   const q = getOrAssignTodayQuestion(couple.id, todayISO());
-  const loginMode = searchParams.login === "1";
-  const actor = searchParams.actor === "a" || searchParams.actor === "b" ? searchParams.actor : undefined;
+  const cookieActor = cookies().get("duoday_actor")?.value;
+  const actor = cookieActor === "a" || cookieActor === "b" ? cookieActor : undefined;
+  const loginMode = !!actor;
   const answers = getAnswers(q.dq_id);
 
   const history = db

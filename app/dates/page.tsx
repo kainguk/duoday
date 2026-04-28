@@ -92,7 +92,7 @@ export default function DatesPage({ searchParams }: { searchParams: { best?: str
                 <ol className="relative pl-12 sm:pl-14">
                   <span className="timeline-rail" aria-hidden />
                   {g.rows.map((r) => (
-                    <li key={r.id} className="timeline-entry relative pb-5 last:pb-0">
+                    <li key={r.id} className="relative pb-5 last:pb-0">
                       <span className="timeline-dot">{r.date.slice(8, 10)}</span>
                       <Card row={r} />
                     </li>

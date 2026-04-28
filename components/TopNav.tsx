@@ -13,12 +13,11 @@ const items = [
 
 export default function TopNav() {
   const pathname = usePathname();
-  const [loggedInOnToday, setLoggedInOnToday] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false);
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    const p = new URLSearchParams(window.location.search);
-    setLoggedInOnToday(pathname === "/today" && p.get("login") === "1" && !!p.get("actor"));
+    setLoggedIn(document.cookie.includes("duoday_actor="));
   }, [pathname]);
 
   return (
@@ -35,13 +34,12 @@ export default function TopNav() {
           </Link>
         );
       })}
-      <span className="mx-1 sm:mx-2 w-px bg-blossom-100" />
-      {loggedInOnToday ? (
-        <Link href="/today" className="btn-ghost px-2 py-1.5 sm:px-3 sm:py-2">
+      {loggedIn ? (
+        <Link href="/logout" className="btn-ghost ml-3 px-2 py-1.5 sm:px-3 sm:py-2">
           로그아웃
         </Link>
       ) : (
-        <Link href="/today/login" className="btn-primary px-2 py-1.5 sm:px-3 sm:py-2">
+        <Link href="/today/login" className="btn-primary ml-3 px-2 py-1.5 sm:px-3 sm:py-2">
           로그인
         </Link>
       )}
