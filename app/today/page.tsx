@@ -1,7 +1,7 @@
 import { getActiveCouple, getOrAssignTodayQuestion, getAnswers } from "@/lib/repo";
 import { todayISO, fmtDate } from "@/lib/utils";
 import { db } from "@/lib/db";
-import AnswerForm from "@/components/AnswerForm";
+import TodayAnswerSlot from "@/components/TodayAnswerSlot";
 
 export const dynamic = "force-dynamic";
 
@@ -39,7 +39,7 @@ export default function TodayPage({ searchParams }: { searchParams: SP }) {
         <h1 className="h-display text-2xl sm:text-3xl text-blossom-800 mb-6">{q.prompt}</h1>
 
         <div className="grid md:grid-cols-2 gap-5">
-          <Slot
+          <TodayAnswerSlot
             name={couple.partner_a}
             author="a"
             dqId={q.dq_id}
@@ -47,7 +47,7 @@ export default function TodayPage({ searchParams }: { searchParams: SP }) {
             actor={actor}
             loginMode={loginMode}
           />
-          <Slot
+          <TodayAnswerSlot
             name={couple.partner_b}
             author="b"
             dqId={q.dq_id}
@@ -74,7 +74,7 @@ export default function TodayPage({ searchParams }: { searchParams: SP }) {
                   </div>
                   <p className="text-ink/90 mb-2">{h.prompt}</p>
                   <div className="grid md:grid-cols-2 gap-3">
-                    <Slot
+                    <TodayAnswerSlot
                       name={couple.partner_a}
                       author="a"
                       dqId={h.dq_id}
@@ -82,7 +82,7 @@ export default function TodayPage({ searchParams }: { searchParams: SP }) {
                       actor={actor}
                       loginMode={loginMode}
                     />
-                    <Slot
+                    <TodayAnswerSlot
                       name={couple.partner_b}
                       author="b"
                       dqId={h.dq_id}
@@ -139,52 +139,3 @@ function AuthPanel({
   );
 }
 
-function Slot({
-  name,
-  author,
-  dqId,
-  answers,
-  actor,
-  loginMode,
-}: {
-  name: string;
-  author: "a" | "b";
-  dqId: number;
-  answers: { author: "a" | "b"; body: string }[];
-  actor?: "a" | "b";
-  loginMode: boolean;
-}) {
-  const mine = answers.find((x) => x.author === author);
-  const myOwnAnswer = actor ? answers.find((x) => x.author === actor) : undefined;
-  const canEdit = !loginMode || actor === author;
-  const canView = !loginMode || !actor || author === actor || !!myOwnAnswer;
-
-  return (
-    <div className="rounded-2xl border border-blossom-100 p-5 bg-white space-y-2">
-      <p className="text-sm text-blossom-600 mb-2">{name}의 답변</p>
-      {!canView ? (
-        <p className="text-sm text-blossom-500">내 답변을 먼저 작성하면 상대 답변을 볼 수 있어요.</p>
-      ) : (
-        <>
-          {mine?.body ? <p className="text-sm text-ink/80 whitespace-pre-wrap bg-blossom-50 rounded-xl p-3">{mine.body}</p> : null}
-          <AnswerForm
-            dqId={dqId}
-            author={author}
-            actor={actor}
-            initial={mine?.body ?? ""}
-            disabled={!canEdit}
-            hint={
-              loginMode
-                ? actor
-                  ? canEdit
-                    ? "이 계정으로 답변을 저장할 수 있어요."
-                    : "로그인한 계정의 답변만 수정할 수 있어요."
-                  : "작성할 계정을 선택해 주세요."
-                : "비로그인 모드에서는 두 사람 답변을 모두 작성할 수 있어요."
-            }
-          />
-        </>
-      )}
-    </div>
-  );
-}

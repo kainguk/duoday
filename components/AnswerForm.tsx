@@ -8,14 +8,12 @@ export default function AnswerForm({
   initial,
   actor,
   disabled = false,
-  hint,
 }: {
   dqId: number;
   author: "a" | "b";
   initial: string;
   actor?: "a" | "b";
   disabled?: boolean;
-  hint?: string;
 }) {
   const r = useRouter();
   const [body, setBody] = useState(initial);
@@ -71,7 +69,6 @@ export default function AnswerForm({
           setSaved(false);
         }}
       />
-      {hint ? <p className="text-xs text-blossom-500">{hint}</p> : null}
       <div className="flex items-center justify-between">
         <span className="text-xs text-blossom-400">{body.length}/1000</span>
         <div className="flex gap-2">

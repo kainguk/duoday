@@ -15,13 +15,15 @@ const WEEKDAYS_KO = ["일", "월", "화", "수", "목", "금", "토"] as const;
 export function fmtDateWithWeekday(iso: string): string {
   const d = parseIsoLikeDate(iso);
   if (Number.isNaN(d.getTime())) return fmtDate(iso);
-  return `${fmtDate(iso)} (${WEEKDAYS_KO[d.getDay()]})`;
+  const w = WEEKDAYS_KO[d.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6] ?? "?";
+  return `${fmtDate(iso)} (${w})`;
 }
 
 export function fmtInputDateWithWeekday(iso: string): string {
   const d = parseIsoLikeDate(iso);
   if (Number.isNaN(d.getTime())) return iso;
-  return `${iso} (${WEEKDAYS_KO[d.getDay()]})`;
+  const w = WEEKDAYS_KO[d.getDay() as 0 | 1 | 2 | 3 | 4 | 5 | 6] ?? "?";
+  return `${iso} (${w})`;
 }
 
 function parseIsoLikeDate(iso: string): Date {

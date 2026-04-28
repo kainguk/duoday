@@ -32,9 +32,9 @@ body { font-family: var(--font-sans, "Pretendard"), system-ui, sans-serif; }
   content: "";
   position: absolute;
   left: 28px;
-  top: 7px;
+  top: 0;
   width: 10px;
-  height: calc(100% - 14px);
+  height: 100%;
   border-radius: 999px;
   background: radial-gradient(circle at center, #f9a8d4 30%, #fff 34%, #f9a8d4 48%, transparent 50%) center top / 10px 20px repeat-y;
   opacity: 0.9;
