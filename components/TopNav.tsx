@@ -17,7 +17,17 @@ export default function TopNav() {
 
   useEffect(() => {
     if (typeof window === "undefined") return;
-    setLoggedIn(document.cookie.includes("duoday_actor="));
+    const hasCookie = document.cookie.includes("duoday_actor=");
+    const hasSession = sessionStorage.getItem("duoday_session") === "1";
+    if (hasCookie && !hasSession) {
+      document.cookie = "duoday_actor=; path=/; max-age=0; SameSite=Lax";
+      setLoggedIn(false);
+      if (pathname === "/today") {
+        window.location.replace("/today");
+      }
+      return;
+    }
+    setLoggedIn(hasCookie && hasSession);
   }, [pathname]);
 
   return (

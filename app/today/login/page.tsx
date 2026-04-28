@@ -18,12 +18,14 @@ export default function TodayLoginPage() {
       return;
     }
     if (uid === "aaaa") {
-      document.cookie = "duoday_actor=a; path=/; max-age=2592000; SameSite=Lax";
+      document.cookie = "duoday_actor=a; path=/; SameSite=Lax";
+      sessionStorage.setItem("duoday_session", "1");
       r.push("/today");
       return;
     }
     if (uid === "bbbb") {
-      document.cookie = "duoday_actor=b; path=/; max-age=2592000; SameSite=Lax";
+      document.cookie = "duoday_actor=b; path=/; SameSite=Lax";
+      sessionStorage.setItem("duoday_session", "1");
       r.push("/today");
       return;
     }
