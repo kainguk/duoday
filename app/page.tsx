@@ -44,9 +44,9 @@ export default function HomePage() {
       </section>
 
       <section className="grid sm:grid-cols-3 gap-4">
-        <Stat label="함께 적은 답변" value={answersCount} suffix="개" />
-        <Stat label="기록한 데이트" value={datesCount} suffix="번" />
-        <Stat label="베스트 순간"    value={bestCount} suffix="개" />
+        <Stat label="함께 적은 답변" value={answersCount} suffix="개" href="/today" />
+        <Stat label="기록한 데이트" value={datesCount} suffix="번" href="/dates" />
+        <Stat label="베스트 순간" value={bestCount} suffix="개" href="/dates?best=1" />
       </section>
 
       <section className="card p-6 md:p-8">
@@ -63,14 +63,24 @@ export default function HomePage() {
   );
 }
 
-function Stat({ label, value, suffix }: { label: string; value: number; suffix: string }) {
+function Stat({
+  label,
+  value,
+  suffix,
+  href,
+}: {
+  label: string;
+  value: number;
+  suffix: string;
+  href: string;
+}) {
   return (
-    <div className="card p-6">
+    <Link href={href} className="card p-6 hover:border-blossom-300 transition block">
       <p className="text-blossom-500 text-sm">{label}</p>
       <p className="mt-1">
         <span className="h-display text-4xl text-blossom-700">{value}</span>
         <span className="ml-1 text-blossom-500">{suffix}</span>
       </p>
-    </div>
+    </Link>
   );
 }

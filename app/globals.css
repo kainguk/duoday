@@ -23,6 +23,35 @@ body { font-family: var(--font-sans, "Pretendard"), system-ui, sans-serif; }
   @apply absolute left-[14px] sm:left-[19px] top-0 bottom-0 w-px bg-gradient-to-b from-blossom-200 via-blossom-300 to-transparent;
 }
 .timeline-dot {
-  @apply absolute left-0 top-1.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-white border-2 border-blossom-300
+  @apply absolute left-0 top-1.5 w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-blossom-50 border-2 border-blossom-300
          flex items-center justify-center text-blossom-500 text-xs font-semibold shadow-sm;
+  box-shadow: inset 0 0 0 2px #fff;
+}
+
+.timeline-entry::before {
+  content: "";
+  position: absolute;
+  left: 28px;
+  top: 7px;
+  width: 10px;
+  height: calc(100% - 14px);
+  border-radius: 999px;
+  background: radial-gradient(circle at center, #f9a8d4 30%, #fff 34%, #f9a8d4 48%, transparent 50%) center top / 10px 20px repeat-y;
+  opacity: 0.9;
+  pointer-events: none;
+}
+
+.book-spread {
+  position: relative;
+}
+.book-spread::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 14px;
+  transform: translateX(-50%);
+  background: linear-gradient(to right, rgba(190, 24, 93, 0.09), rgba(236, 72, 153, 0.05), rgba(190, 24, 93, 0.09));
+  pointer-events: none;
 }

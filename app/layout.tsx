@@ -1,6 +1,7 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import Link from "next/link";
+import TopNav from "@/components/TopNav";
 
 export const metadata: Metadata = {
   title: "DuoDay — 우리 둘만의 하루 기록",
@@ -21,12 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 DuoDay <span className="text-blossom-400">·</span>{" "}
                 <span className="text-sm font-sans text-blossom-500">우리 둘의 하루</span>
               </Link>
-              <nav className="flex flex-wrap gap-1 text-xs sm:text-sm">
-                <Link href="/today"     className="btn-ghost px-2 py-1.5 sm:px-3 sm:py-2">오늘의 질문</Link>
-                <Link href="/dates"     className="btn-ghost px-2 py-1.5 sm:px-3 sm:py-2">데이트 타임라인</Link>
-                <Link href="/dashboard" className="btn-ghost px-2 py-1.5 sm:px-3 sm:py-2">대시보드</Link>
-                <Link href="/book"      className="btn-ghost px-2 py-1.5 sm:px-3 sm:py-2">책 만들기</Link>
-              </nav>
+              <TopNav />
             </div>
           </header>
           <main className="max-w-5xl mx-auto px-4 sm:px-5 py-8 sm:py-10">{children}</main>

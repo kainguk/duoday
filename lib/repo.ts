@@ -1,4 +1,5 @@
 import { db } from "./db";
+import { toPublicImagePath } from "./utils";
 
 export type Couple = {
   id: string;
@@ -88,7 +89,7 @@ export function getPrimaryPhoto(log: Pick<DateLog, "id" | "photo_path">): string
   const first = db
     .prepare(`SELECT path FROM date_photos WHERE date_log_id = ? ORDER BY sort_order, id LIMIT 1`)
     .get(log.id) as { path: string } | undefined;
-  return first?.path ?? log.photo_path ?? null;
+  return toPublicImagePath(first?.path ?? log.photo_path ?? null);
 }
 
 /* ---------- Order state machine (Lv2 강화) ---------- */
@@ -97,8 +98,8 @@ export type OrderStatus = "pending" | "processing" | "completed" | "cancelled";
 export const ALLOWED_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
   pending:    ["processing", "cancelled"],
   processing: ["completed", "cancelled"],
-  completed:  [],          // 종료 상태
-  cancelled:  [],          // 종료 상태
+  completed:  ["pending", "processing", "cancelled"], // 테스트 버전: 재수정 허용
+  cancelled:  ["pending", "processing"],              // 테스트 버전: 재개 허용
 };
 
 export function canTransition(from: OrderStatus, to: OrderStatus): boolean {

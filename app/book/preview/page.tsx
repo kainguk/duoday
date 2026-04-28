@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getActiveCouple, getPrimaryPhoto } from "@/lib/repo";
-import { fmtDate } from "@/lib/utils";
+import { fmtDateWithWeekday } from "@/lib/utils";
 import { EmotionBadge, BestBadge } from "@/components/Badges";
 import { Placeholder } from "@/components/Placeholder";
 
@@ -82,7 +82,7 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
                 {couple.partner_a} <span className="opacity-60">&</span> {couple.partner_b}
               </p>
               <p className="mt-6 text-xs sm:text-sm opacity-80">
-                {fmtDate(start)} ~ {fmtDate(end)}
+                {fmtDateWithWeekday(start)} ~ {fmtDateWithWeekday(end)}
               </p>
               <p className="mt-1 text-xs opacity-70">총 {totalRecords}개의 기록</p>
             </div>
@@ -117,7 +117,7 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
             <div>
               <p className="h-display text-2xl sm:text-3xl text-blossom-800 mb-3">고마운 날들</p>
               <p className="text-ink/70 text-sm sm:text-base max-w-md mx-auto">
-                {couple.partner_a}와 {couple.partner_b}가 함께한 {fmtDate(start)}부터 {fmtDate(end)}까지의
+                {couple.partner_a}와 {couple.partner_b}가 함께한 {fmtDateWithWeekday(start)}부터 {fmtDateWithWeekday(end)}까지의
                 기록 {totalRecords}편을 한 권에 담았습니다.
               </p>
               <p className="mt-6 text-xs text-blossom-400">made with 💗 by DuoDay</p>
@@ -133,7 +133,7 @@ function Page({ label, children }: { label: string; children: React.ReactNode })
   return (
     <section>
       <p className="text-xs text-blossom-500 mb-2 ml-1">{label}</p>
-      <div className="card overflow-hidden">{children}</div>
+      <div className="card overflow-hidden book-spread">{children}</div>
     </section>
   );
 }
@@ -166,7 +166,7 @@ function DatePage({
       </div>
       <div className="p-6 sm:p-8">
         <div className="flex flex-wrap items-center gap-2 text-xs text-blossom-500 mb-2">
-          <span>{fmtDate(row.date)}</span>
+          <span>{fmtDateWithWeekday(row.date)}</span>
           <span aria-hidden>·</span>
           <span>{row.place}</span>
           <EmotionBadge tag={row.emotion_tag} />
@@ -199,7 +199,7 @@ function QuestionsPage({
           const b = ans.find((x) => x.author === "b");
           return (
             <li key={q.dq_id} className="border-b border-blossom-100 pb-3 last:border-0">
-              <div className="text-xs text-blossom-500 mb-1">{fmtDate(q.date)}</div>
+              <div className="text-xs text-blossom-500 mb-1">{fmtDateWithWeekday(q.date)}</div>
               <p className="text-ink/90 text-sm font-medium mb-2">Q. {q.prompt}</p>
               <div className="grid sm:grid-cols-2 gap-2 text-sm">
                 <div className="bg-blossom-50 rounded-lg p-2">

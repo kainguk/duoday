@@ -1,6 +1,7 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { fmtDateWithWeekday } from "@/lib/utils";
 
 export default function BookForm({
   defaultStart,
@@ -19,8 +20,27 @@ export default function BookForm({
   const [note, setNote] = useState("");
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+  const palette = [
+    "#e35c8a",
+    "#7a2244",
+    "#f7a3bc",
+    "#3a1f2b",
+    "#c84473",
+    "#6d4aff",
+    "#4a6fff",
+    "#0096a6",
+    "#1f7a3a",
+    "#d66a00",
+    "#374151",
+    "#111827",
+  ];
 
   async function preview() {
+    if (!iq && !id) {
+      setErr("질문 답변 또는 데이트 기록 중 최소 1개는 포함해야 해요.");
+      return;
+    }
+    setErr(null);
     const params = new URLSearchParams({
       title, cover_color: color, start, end,
       iq: iq ? "1" : "0", id: id ? "1" : "0",
@@ -30,6 +50,10 @@ export default function BookForm({
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
+    if (!iq && !id) {
+      setErr("질문 답변 또는 데이트 기록 중 최소 1개는 포함해야 해요.");
+      return;
+    }
     setBusy(true);
     setErr(null);
     const res = await fetch("/api/orders", {
@@ -73,7 +97,7 @@ export default function BookForm({
             className="w-14 h-12 rounded-lg border border-blossom-200 cursor-pointer"
           />
           <div className="flex flex-wrap gap-2">
-            {["#e35c8a", "#7a2244", "#f7a3bc", "#3a1f2b", "#c84473"].map((c) => (
+            {palette.map((c) => (
               <button
                 key={c}
                 type="button"
@@ -91,10 +115,12 @@ export default function BookForm({
         <div>
           <label className="label">시작일</label>
           <input className="input" type="date" required value={start} onChange={(e) => setStart(e.target.value)} />
+          <p className="mt-1 text-xs text-blossom-500">{fmtDateWithWeekday(start)}</p>
         </div>
         <div>
           <label className="label">종료일</label>
           <input className="input" type="date" required value={end} onChange={(e) => setEnd(e.target.value)} />
+          <p className="mt-1 text-xs text-blossom-500">{fmtDateWithWeekday(end)}</p>
         </div>
       </div>
 
@@ -114,7 +140,7 @@ export default function BookForm({
         <textarea
           className="input min-h-[90px] resize-y"
           maxLength={500}
-          placeholder="제작 메모"
+          placeholder="이 메모는 주문 상세 화면에 표시돼요. (예: 꼭 넣고 싶은 문구, 내부 확인용 메모)"
           value={note}
           onChange={(e) => setNote(e.target.value)}
         />

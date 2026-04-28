@@ -36,6 +36,13 @@ export default function DashboardPage() {
     )
     .all(couple.id) as { t: string; c: number }[];
   const top = tags[0];
+  const tagColor: Record<string, string> = {
+    happy: "bg-amber-200 text-amber-900 border border-amber-300",
+    flutter: "bg-fuchsia-200 text-fuchsia-900 border border-fuchsia-300",
+    calm: "bg-emerald-100 text-emerald-700 border border-emerald-200",
+    special: "bg-amber-100 text-amber-700 border border-amber-200",
+    regret: "bg-slate-100 text-slate-700 border border-slate-200",
+  };
 
   return (
     <div className="space-y-8">
@@ -45,13 +52,14 @@ export default function DashboardPage() {
       </div>
 
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Stat label="전체 데이트 기록" value={totalDates} suffix="개" />
-        <Stat label="베스트 순간" value={bestDates} suffix="개" tone="amber" />
-        <Stat label="질문 답변" value={totalAnswers} suffix="개" />
+        <Stat label="전체 데이트 기록" value={totalDates} suffix="개" href="/dates" />
+        <Stat label="베스트 순간" value={bestDates} suffix="개" tone="amber" href="/dates?best=1" />
+        <Stat label="질문 답변" value={totalAnswers} suffix="개" href="/today" />
         <Stat
           label="가장 많이 쓴 감정"
           value={top?.c ?? 0}
           suffix={top ? ` · ${emotionMeta(top.t)?.emoji ?? ""} ${emotionMeta(top.t)?.label ?? top.t}` : ""}
+          href={top ? `/dates?tag=${top.t}` : "/dates"}
         />
       </section>
 
@@ -87,7 +95,10 @@ export default function DashboardPage() {
               const found = tags.find((x) => x.t === t.value);
               const c = found?.c ?? 0;
               return (
-                <span key={t.value} className={`chip ${t.color} ${c === 0 ? "opacity-50" : ""}`}>
+                <span
+                  key={t.value}
+                  className={`chip ${tagColor[t.value] ?? "bg-blossom-100 text-blossom-700 border border-blossom-200"} ${c === 0 ? "opacity-50" : ""}`}
+                >
                   <span className="mr-1">{t.emoji}</span> {t.label} · {c}
                 </span>
               );
@@ -99,9 +110,21 @@ export default function DashboardPage() {
   );
 }
 
-function Stat({ label, value, suffix, tone }: { label: string; value: number; suffix?: string; tone?: "amber" }) {
+function Stat({
+  label,
+  value,
+  suffix,
+  tone,
+  href,
+}: {
+  label: string;
+  value: number;
+  suffix?: string;
+  tone?: "amber";
+  href: string;
+}) {
   return (
-    <div className="card p-5">
+    <a href={href} className="card p-5 block hover:border-blossom-300 transition">
       <p className="text-blossom-500 text-sm">{label}</p>
       <p className="mt-1">
         <span className={`h-display text-3xl ${tone === "amber" ? "text-amber-600" : "text-blossom-700"}`}>
@@ -109,6 +132,6 @@ function Stat({ label, value, suffix, tone }: { label: string; value: number; su
         </span>
         <span className="ml-1 text-blossom-500 text-sm">{suffix}</span>
       </p>
-    </div>
+    </a>
   );
 }

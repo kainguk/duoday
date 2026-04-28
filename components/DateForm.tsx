@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { EMOTION_TAGS } from "@/lib/emotions";
-import { todayISO } from "@/lib/utils";
+import { todayISO, fmtInputDateWithWeekday, toPublicImagePath } from "@/lib/utils";
 
 type Initial = {
   id?: number;
@@ -71,6 +71,7 @@ export default function DateForm({ initial }: { initial?: Initial }) {
             value={date}
             onChange={(e) => setDate(e.target.value)}
           />
+          <p className="mt-1 text-xs text-blossom-500">{fmtInputDateWithWeekday(date)}</p>
         </div>
         <div>
           <label className="label">장소</label>
@@ -149,7 +150,7 @@ export default function DateForm({ initial }: { initial?: Initial }) {
                 <div key={p.id} className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={p.path}
+                    src={toPublicImagePath(p.path) ?? ""}
                     alt=""
                     className={`w-full h-24 object-cover rounded-lg ${
                       removed ? "opacity-30" : ""
@@ -175,14 +176,20 @@ export default function DateForm({ initial }: { initial?: Initial }) {
 
       <div>
         <label className="label">사진 추가 (여러 장 선택 가능)</label>
-        <input
-          className="input"
-          type="file"
-          accept="image/*"
-          multiple
-          onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
-        />
-        <p className="text-xs text-blossom-400 mt-1">장당 최대 5MB</p>
+        <label className="block rounded-xl border border-dashed border-blossom-300 bg-blossom-50/60 p-4 cursor-pointer hover:bg-blossom-50 transition">
+          <input
+            className="hidden"
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={(e) => setFiles(Array.from(e.target.files ?? []))}
+          />
+          <p className="text-sm text-blossom-700">클릭해서 사진 선택</p>
+          <p className="text-xs text-blossom-500 mt-1">여러 장 업로드 가능 · 장당 최대 5MB</p>
+          {files.length > 0 ? (
+            <p className="text-xs text-blossom-600 mt-2">{files.length}장 선택됨</p>
+          ) : null}
+        </label>
       </div>
 
       {err && <p className="text-sm text-red-500">{err}</p>}

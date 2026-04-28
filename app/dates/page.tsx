@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getActiveCouple, getPrimaryPhoto } from "@/lib/repo";
-import { fmtDate, ymKey, ymLabel } from "@/lib/utils";
+import { fmtDateWithWeekday, ymKey, ymLabel } from "@/lib/utils";
 import { EmotionBadge, BestBadge } from "@/components/Badges";
 import { Placeholder } from "@/components/Placeholder";
 
@@ -92,7 +92,7 @@ export default function DatesPage({ searchParams }: { searchParams: { best?: str
                 <ol className="relative pl-12 sm:pl-14">
                   <span className="timeline-rail" aria-hidden />
                   {g.rows.map((r) => (
-                    <li key={r.id} className="relative pb-5 last:pb-0">
+                    <li key={r.id} className="timeline-entry relative pb-5 last:pb-0">
                       <span className="timeline-dot">{r.date.slice(8, 10)}</span>
                       <Card row={r} />
                     </li>
@@ -164,7 +164,7 @@ function Card({ row }: { row: Row }) {
       <div className="w-full sm:w-44 h-40 sm:h-auto shrink-0 relative">
         {photo ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={row.title} className="w-full h-full object-cover" />
+          <img src={photo} alt={row.title} className="w-full h-full object-contain bg-blossom-50 p-1" />
         ) : (
           <Placeholder label={row.title} />
         )}
@@ -174,7 +174,7 @@ function Card({ row }: { row: Row }) {
       </div>
       <div className="p-4 sm:p-5 flex-1 min-w-0">
         <div className="flex flex-wrap items-center gap-2 text-xs text-blossom-500 mb-1">
-          <span>{fmtDate(row.date)}</span>
+          <span>{fmtDateWithWeekday(row.date)}</span>
           <span aria-hidden>·</span>
           <span className="truncate">{row.place}</span>
         </div>

@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { db } from "@/lib/db";
 import { getActiveCouple } from "@/lib/repo";
-import { fmtDate } from "@/lib/utils";
+import { fmtDateWithWeekday } from "@/lib/utils";
 import { StatusChip } from "@/components/StatusChip";
 
 export const dynamic = "force-dynamic";
@@ -42,15 +42,20 @@ export default function BookListPage() {
           {orders.map((o) => (
             <li key={o.id}>
               <Link href={`/book/${o.id}`} className="card p-5 flex gap-4 hover:border-blossom-300 transition">
-                <div className="w-20 h-28 rounded-md shrink-0 shadow-soft" style={{ background: o.cover_color }} />
+                <div
+                  className="w-20 h-28 rounded-md shrink-0 shadow-soft text-white h-display text-xs leading-tight p-2 flex items-center justify-center text-center"
+                  style={{ background: o.cover_color }}
+                >
+                  <span className="line-clamp-4">{o.title}</span>
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-xs text-blossom-500 mb-1">
-                    {fmtDate(o.range_start)} ~ {fmtDate(o.range_end)}
+                    {fmtDateWithWeekday(o.range_start)} ~ {fmtDateWithWeekday(o.range_end)}
                   </p>
                   <h3 className="h-display text-xl text-blossom-800 truncate">{o.title}</h3>
                   <div className="mt-3 flex items-center gap-2 flex-wrap">
                     <StatusChip status={o.status} />
-                    <span className="text-xs text-blossom-400">주문: {fmtDate(o.created_at)}</span>
+                    <span className="text-xs text-blossom-400">주문: {fmtDateWithWeekday(o.created_at)}</span>
                   </div>
                 </div>
               </Link>

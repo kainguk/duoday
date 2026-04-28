@@ -17,7 +17,7 @@ export default function NewBookPage() {
   const today = new Date().toISOString().slice(0, 10);
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="space-y-0">
       <h1 className="h-display text-3xl text-blossom-800 mb-2">새 책 주문</h1>
       <p className="text-blossom-500 mb-6">
         선택한 기간의 질문 답변과 데이트 기록이 한 권으로 묶입니다. <br className="hidden sm:block" />

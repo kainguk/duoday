@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { db } from "@/lib/db";
 import { getActiveCouple } from "@/lib/repo";
-import { fmtDate } from "@/lib/utils";
+import { fmtDateWithWeekday } from "@/lib/utils";
 import { StatusChip } from "@/components/StatusChip";
 import OrderActions from "@/components/OrderActions";
 
@@ -77,7 +77,7 @@ export default function BookDetail({ params }: { params: { id: string } }) {
           <p className="text-xs text-blossom-500 mb-1">주문번호 {order.id}</p>
           <h1 className="h-display text-2xl md:text-3xl text-blossom-800">{order.title}</h1>
           <p className="text-sm text-blossom-600 mt-1">
-            {fmtDate(order.range_start)} ~ {fmtDate(order.range_end)}
+            {fmtDateWithWeekday(order.range_start)} ~ {fmtDateWithWeekday(order.range_end)}
           </p>
           <div className="mt-3 flex flex-wrap gap-2">
             <StatusChip status={order.status} />
@@ -105,12 +105,12 @@ export default function BookDetail({ params }: { params: { id: string } }) {
         <PreviewCard
           title="포함될 질문 (최근 5개)"
           empty="이 기간에 포함될 질문 답변이 없어요."
-          rows={qPreview.map((q) => ({ left: fmtDate(q.date), right: q.prompt }))}
+          rows={qPreview.map((q) => ({ left: fmtDateWithWeekday(q.date), right: q.prompt }))}
         />
         <PreviewCard
           title="포함될 데이트 (최근 5개)"
           empty="이 기간에 포함될 데이트 기록이 없어요."
-          rows={dPreview.map((d) => ({ left: fmtDate(d.date), right: `${d.title} · ${d.place}` }))}
+          rows={dPreview.map((d) => ({ left: fmtDateWithWeekday(d.date), right: `${d.title} · ${d.place}` }))}
         />
       </div>
     </div>

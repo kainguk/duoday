@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getActiveCouple, getDateLog, getDatePhotos, getPrimaryPhoto } from "@/lib/repo";
-import { fmtDate } from "@/lib/utils";
+import { fmtDateWithWeekday, toPublicImagePath } from "@/lib/utils";
 import { EmotionBadge, BestBadge } from "@/components/Badges";
 import DeleteDateButton from "@/components/DeleteDateButton";
 import { Placeholder } from "@/components/Placeholder";
@@ -17,7 +17,12 @@ export default function DateDetail({ params }: { params: { id: string } }) {
 
   const photos = getDatePhotos(log.id);
   const primary = getPrimaryPhoto(log);
-  const gallery = photos.length > 0 ? photos.map((p) => p.path) : primary ? [primary] : [];
+  const gallery =
+    photos.length > 0
+      ? photos.map((p) => toPublicImagePath(p.path)).filter((x): x is string => !!x)
+      : primary
+      ? [primary]
+      : [];
 
   return (
     <div className="space-y-6">
@@ -27,7 +32,7 @@ export default function DateDetail({ params }: { params: { id: string } }) {
         <div className="w-full aspect-[16/9] bg-blossom-50 relative">
           {gallery[0] ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={gallery[0]} alt={log.title} className="w-full h-full object-cover" />
+            <img src={gallery[0]} alt={log.title} className="w-full h-full object-contain bg-blossom-50 p-1" />
           ) : (
             <Placeholder label={log.title} />
           )}
@@ -37,7 +42,7 @@ export default function DateDetail({ params }: { params: { id: string } }) {
         </div>
         <div className="p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-2 text-sm text-blossom-500 mb-2">
-            <span>{fmtDate(log.date)}</span>
+            <span>{fmtDateWithWeekday(log.date)}</span>
             <span aria-hidden>·</span>
             <span>{log.place}</span>
             <EmotionBadge tag={log.emotion_tag} />
@@ -49,7 +54,7 @@ export default function DateDetail({ params }: { params: { id: string } }) {
             <div className="mt-6 grid grid-cols-3 sm:grid-cols-4 gap-2">
               {gallery.slice(1).map((src, i) => (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img key={i} src={src} alt="" className="w-full h-24 object-cover rounded-lg" />
+                <img key={i} src={src} alt="" className="w-full h-24 object-contain rounded-lg bg-blossom-50 p-1" />
               ))}
             </div>
           )}

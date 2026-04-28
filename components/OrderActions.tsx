@@ -12,8 +12,15 @@ const NEXT: Record<OrderStatus, { label: string; status: OrderStatus; cls: strin
     { label: "제작 완료", status: "completed", cls: "btn-primary" },
     { label: "주문 취소", status: "cancelled", cls: "btn-ghost" },
   ],
-  completed: [],
-  cancelled: [],
+  completed: [
+    { label: "제작 대기로 되돌리기", status: "pending", cls: "btn-ghost" },
+    { label: "처리 중으로 변경", status: "processing", cls: "btn-ghost" },
+    { label: "주문 취소", status: "cancelled", cls: "btn-ghost" },
+  ],
+  cancelled: [
+    { label: "제작 대기로 되돌리기", status: "pending", cls: "btn-ghost" },
+    { label: "처리 중으로 변경", status: "processing", cls: "btn-ghost" },
+  ],
 };
 
 export default function OrderActions({
@@ -64,7 +71,7 @@ export default function OrderActions({
   return (
     <div className="flex flex-wrap gap-2">
       {actions.length === 0 ? (
-        <span className="text-sm text-blossom-500">최종 상태입니다.</span>
+        <span className="btn-ghost">최종 상태입니다.</span>
       ) : (
         actions.map((a) => (
           <button key={a.status} className={a.cls} disabled={busy} onClick={() => patch(a.status)}>
