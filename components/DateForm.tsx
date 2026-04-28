@@ -1,5 +1,5 @@
 "use client";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { EMOTION_TAGS } from "@/lib/emotions";
 import { todayISO, fmtInputDateWithWeekday, normalizeDateInput, toPublicImagePath } from "@/lib/utils";
@@ -28,8 +28,56 @@ export default function DateForm({ initial }: { initial?: Initial }) {
   const [files, setFiles] = useState<File[]>([]);
   const [removeIds, setRemoveIds] = useState<number[]>([]);
   const [existingPhotos] = useState(initial?.photos ?? []);
+  const [primaryPhotoRef, setPrimaryPhotoRef] = useState<string | null>(
+    existingPhotos.length > 0 ? `existing:${existingPhotos[0].id}` : null
+  );
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
+
+  useEffect(() => {
+    const hasExisting = existingPhotos.some((p) => !removeIds.includes(p.id));
+    const hasNew = files.length > 0;
+    if (!hasExisting && !hasNew) {
+      setPrimaryPhotoRef(null);
+      return;
+    }
+    if (!primaryPhotoRef) {
+      if (hasExisting) {
+        const firstExisting = existingPhotos.find((p) => !removeIds.includes(p.id));
+        if (firstExisting) setPrimaryPhotoRef(`existing:${firstExisting.id}`);
+      } else {
+        setPrimaryPhotoRef("new:0");
+      }
+      return;
+    }
+    if (primaryPhotoRef.startsWith("existing:")) {
+      const id = Number(primaryPhotoRef.slice("existing:".length));
+      if (!existingPhotos.some((p) => p.id === id && !removeIds.includes(p.id))) {
+        if (hasExisting) {
+          const firstExisting = existingPhotos.find((p) => !removeIds.includes(p.id));
+          if (firstExisting) setPrimaryPhotoRef(`existing:${firstExisting.id}`);
+        } else if (hasNew) {
+          setPrimaryPhotoRef("new:0");
+        } else {
+          setPrimaryPhotoRef(null);
+        }
+      }
+      return;
+    }
+    if (primaryPhotoRef.startsWith("new:")) {
+      const idx = Number(primaryPhotoRef.slice("new:".length));
+      if (!Number.isFinite(idx) || idx < 0 || idx >= files.length) {
+        if (hasExisting) {
+          const firstExisting = existingPhotos.find((p) => !removeIds.includes(p.id));
+          if (firstExisting) setPrimaryPhotoRef(`existing:${firstExisting.id}`);
+        } else if (hasNew) {
+          setPrimaryPhotoRef("new:0");
+        } else {
+          setPrimaryPhotoRef(null);
+        }
+      }
+    }
+  }, [existingPhotos, files, primaryPhotoRef, removeIds]);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -42,6 +90,7 @@ export default function DateForm({ initial }: { initial?: Initial }) {
     fd.set("feeling", feeling);
     fd.set("emotion_tag", emotion);
     fd.set("is_best", isBest ? "1" : "0");
+    if (primaryPhotoRef) fd.set("primary_photo_ref", primaryPhotoRef);
     for (const f of files) fd.append("photos", f);
     for (const id of removeIds) fd.append("remove_photo_ids", String(id));
 
@@ -167,16 +216,28 @@ export default function DateForm({ initial }: { initial?: Initial }) {
           <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
             {existingPhotos.map((p) => {
               const removed = removeIds.includes(p.id);
+              const isPrimary = primaryPhotoRef === `existing:${p.id}`;
               return (
                 <div key={p.id} className="relative">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={toPublicImagePath(p.path) ?? ""}
                     alt=""
-                    className={`w-full h-24 object-cover rounded-lg ${
-                      removed ? "opacity-30" : ""
+                    className={`w-full h-24 object-cover rounded-lg border-2 ${
+                      removed ? "opacity-30 border-transparent" : isPrimary ? "border-blossom-500" : "border-transparent"
                     }`}
                   />
+                  {!removed ? (
+                    <button
+                      type="button"
+                      onClick={() => setPrimaryPhotoRef(`existing:${p.id}`)}
+                      className={`absolute bottom-1 left-1 text-xs rounded-full px-2 py-0.5 shadow ${
+                        isPrimary ? "bg-blossom-500 text-white" : "bg-white/90 text-blossom-700"
+                      }`}
+                    >
+                      대표
+                    </button>
+                  ) : null}
                   <button
                     type="button"
                     onClick={() =>
@@ -208,7 +269,28 @@ export default function DateForm({ initial }: { initial?: Initial }) {
           <p className="text-sm text-blossom-700">클릭해서 사진 선택</p>
           <p className="text-xs text-blossom-500 mt-1">여러 장 업로드 가능 · 장당 최대 5MB</p>
           {files.length > 0 ? (
-            <p className="text-xs text-blossom-600 mt-2">{files.length}장 선택됨</p>
+            <div className="mt-2 space-y-1">
+              <p className="text-xs text-blossom-600">{files.length}장 선택됨</p>
+              <ul className="space-y-1">
+                {files.map((f, idx) => {
+                  const isPrimary = primaryPhotoRef === `new:${idx}`;
+                  return (
+                    <li key={`${f.name}-${idx}`} className="flex items-center justify-between gap-2 text-xs">
+                      <span className="truncate text-blossom-700">{f.name}</span>
+                      <button
+                        type="button"
+                        onClick={() => setPrimaryPhotoRef(`new:${idx}`)}
+                        className={`rounded-full px-2 py-0.5 ${
+                          isPrimary ? "bg-blossom-500 text-white" : "bg-white text-blossom-700 border border-blossom-200"
+                        }`}
+                      >
+                        대표
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
           ) : null}
         </label>
       </div>

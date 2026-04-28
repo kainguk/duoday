@@ -29,6 +29,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (!log) return NextResponse.json({ error: "not found" }, { status: 404 });
 
   const fd = await req.formData();
+  const primaryRef = (fd.get("primary_photo_ref") ?? "").toString();
   const parsed = PutSchema.safeParse({
     date: fd.get("date"),
     place: fd.get("place"),
@@ -73,6 +74,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   );
   const maxSortRow = db.prepare(`SELECT COALESCE(MAX(sort_order), -1) m FROM date_photos WHERE date_log_id = ?`);
   const insPhoto = db.prepare(`INSERT INTO date_photos (date_log_id, path, sort_order) VALUES (?,?,?)`);
+  const reorderPhotoSort = db.prepare(`UPDATE date_photos SET sort_order = ? WHERE id = ?`);
 
   const tx = db.transaction(() => {
     updateLog.run(
@@ -87,7 +89,30 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     );
     if (removeIds.length > 0) delPhotos.run(log.id, ...removeIds);
     let next = ((maxSortRow.get(log.id) as { m: number }).m ?? -1) + 1;
-    for (const p of newPaths) insPhoto.run(log.id, p, next++);
+    const newInsertedIds: number[] = [];
+    for (const p of newPaths) {
+      const r = insPhoto.run(log.id, p, next++);
+      newInsertedIds.push(Number(r.lastInsertRowid));
+    }
+
+    const current = db
+      .prepare(`SELECT id, path, sort_order FROM date_photos WHERE date_log_id = ? ORDER BY sort_order, id`)
+      .all(log.id) as { id: number; path: string; sort_order: number }[];
+
+    let primaryId: number | null = null;
+    if (primaryRef.startsWith("existing:")) {
+      const target = Number(primaryRef.slice("existing:".length));
+      if (current.some((p) => p.id === target)) primaryId = target;
+    } else if (primaryRef.startsWith("new:")) {
+      const idx = Number(primaryRef.slice("new:".length));
+      if (Number.isFinite(idx) && idx >= 0 && idx < newInsertedIds.length) {
+        primaryId = newInsertedIds[idx];
+      }
+    }
+    const ordered = primaryId
+      ? [current.find((p) => p.id === primaryId)!, ...current.filter((p) => p.id !== primaryId)]
+      : current;
+    ordered.forEach((p, i) => reorderPhotoSort.run(i, p.id));
 
     // Recompute legacy photo_path = first remaining photo (for backwards compat & thumbnail fallback)
     const first = db

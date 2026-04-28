@@ -24,6 +24,7 @@ const BaseSchema = z.object({
 
 export async function POST(req: NextRequest) {
   const fd = await req.formData();
+  const primaryRef = (fd.get("primary_photo_ref") ?? "").toString();
   const parsed = BaseSchema.safeParse({
     date: fd.get("date"),
     place: fd.get("place"),
@@ -46,6 +47,14 @@ export async function POST(req: NextRequest) {
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 400 });
   }
+  const orderedPaths = [...paths];
+  if (primaryRef.startsWith("new:")) {
+    const idx = Number(primaryRef.slice("new:".length));
+    if (Number.isFinite(idx) && idx >= 0 && idx < orderedPaths.length) {
+      const [picked] = orderedPaths.splice(idx, 1);
+      orderedPaths.unshift(picked);
+    }
+  }
 
   const couple = getActiveCouple();
   const insLog = db.prepare(
@@ -63,12 +72,12 @@ export async function POST(req: NextRequest) {
       parsed.data.place,
       parsed.data.title,
       parsed.data.feeling,
-      paths[0] ?? null, // 대표 = 첫 장 (legacy 호환)
+      orderedPaths[0] ?? null,
       parsed.data.emotion_tag,
       parsed.data.is_best
     );
     const dateLogId = Number(r.lastInsertRowid);
-    paths.forEach((p, i) => insPhoto.run(dateLogId, p, i));
+    orderedPaths.forEach((p, i) => insPhoto.run(dateLogId, p, i));
     return dateLogId;
   });
 
