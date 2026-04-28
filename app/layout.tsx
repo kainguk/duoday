@@ -16,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ko">
       <body>
         <div className="min-h-screen bg-gradient-to-b from-blossom-50 via-white to-blossom-50">
-          <header className="border-b border-blossom-100 bg-white/70 backdrop-blur sticky top-0 z-10">
+          <header className="border-b border-blossom-100 bg-white/70 backdrop-blur sticky top-0 z-50">
             <div className="max-w-5xl mx-auto px-4 sm:px-5 py-2 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1">
               <Link href="/" className="h-display text-2xl text-blossom-700">
                 DuoDay <span className="text-blossom-400">·</span>{" "}

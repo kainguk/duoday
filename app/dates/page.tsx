@@ -159,7 +159,7 @@ function Card({ row }: { row: Row }) {
   return (
     <Link
       href={`/dates/${row.id}`}
-      className="relative z-10 block ml-2 card overflow-hidden hover:border-blossom-300 transition flex flex-col sm:flex-row"
+      className="block ml-2 card overflow-hidden hover:border-blossom-300 transition flex flex-col sm:flex-row"
     >
       <div className="w-full sm:w-44 h-40 sm:h-auto shrink-0 relative">
         {photo ? (
