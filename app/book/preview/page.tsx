@@ -72,10 +72,12 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
         {/* COVER */}
         <Page label="표지">
           <div
-            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft flex items-center justify-center text-white p-8 sm:p-14 text-center"
+            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft text-white p-8 sm:p-14"
             style={{ background: cover_color }}
           >
-            <div>
+            <div className="h-full grid sm:grid-cols-2 items-center">
+              <div className="hidden sm:block" />
+              <div className="text-center sm:text-left sm:pl-10">
               <p className="text-xs sm:text-sm tracking-widest opacity-80 mb-3">DUODAY · 우리 둘의 하루</p>
               <h2 className="h-display text-3xl sm:text-5xl mb-4">{title}</h2>
               <p className="opacity-90 text-sm sm:text-base">
@@ -85,6 +87,7 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
                 {fmtDateWithWeekday(start)} ~ {fmtDateWithWeekday(end)}
               </p>
               <p className="mt-1 text-xs opacity-70">총 {totalRecords}개의 기록</p>
+              </div>
             </div>
           </div>
         </Page>
@@ -112,15 +115,22 @@ export default function BookPreviewPage({ searchParams }: { searchParams: SP }) 
         {/* CLOSING */}
         <Page label="마지막 페이지">
           <div
-            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft flex items-center justify-center bg-white border border-blossom-100 p-8 sm:p-14 text-center"
+            className="aspect-[3/4] sm:aspect-[3/2] w-full rounded-xl shadow-soft bg-white border border-blossom-100 p-8 sm:p-14"
           >
-            <div>
-              <p className="h-display text-2xl sm:text-3xl text-blossom-800 mb-3">고마운 날들</p>
-              <p className="text-ink/70 text-sm sm:text-base max-w-md mx-auto">
-                {couple.partner_a}와 {couple.partner_b}가 함께한 {fmtDateWithWeekday(start)}부터 {fmtDateWithWeekday(end)}까지의
-                기록 {totalRecords}편을 한 권에 담았습니다.
-              </p>
-              <p className="mt-6 text-xs text-blossom-400">made with 💗 by DuoDay</p>
+            <div className="h-full grid sm:grid-cols-2 items-center">
+              <div className="text-center sm:text-left sm:pr-10">
+                <p className="h-display text-2xl sm:text-3xl text-blossom-800 mb-3">고마운 날들</p>
+                <p className="text-ink/70 text-sm sm:text-base">
+                  {couple.partner_a}과 {couple.partner_b}이 함께한 {fmtDateWithWeekday(start).replace(" ", "")}부터
+                  <br />
+                  {fmtDateWithWeekday(end).replace(" ", "")}까지의 이야기를
+                  <br />
+                  한 권에 담았습니다.
+                </p>
+                <p className="mt-2 text-sm text-ink/60">총 {totalRecords}편의 기록</p>
+                <p className="mt-6 text-xs text-blossom-400">made with 💗 by DuoDay</p>
+              </div>
+              <div className="hidden sm:block" />
             </div>
           </div>
         </Page>
@@ -156,15 +166,17 @@ function DatePage({
   return (
     <div className="grid sm:grid-cols-2 gap-0">
       <div className="aspect-[4/3] sm:aspect-auto sm:min-h-[260px] relative">
-        {photo ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={photo} alt={row.title} className="absolute inset-0 w-full h-full object-cover" />
-        ) : (
-          <Placeholder label={row.title} />
-        )}
+        <div className="absolute inset-0">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={photo} alt={row.title} className="w-full h-full object-cover" />
+          ) : (
+            <Placeholder label={row.title} />
+          )}
+        </div>
         {row.is_best ? <div className="absolute top-3 left-3"><BestBadge /></div> : null}
       </div>
-      <div className="p-6 sm:p-8">
+      <div className="p-6 sm:py-8 sm:pl-10 sm:pr-8">
         <div className="flex flex-wrap items-center gap-2 text-xs text-blossom-500 mb-2">
           <span>{fmtDateWithWeekday(row.date)}</span>
           <span aria-hidden>·</span>
@@ -187,11 +199,14 @@ function QuestionsPage({
   aName: string;
   bName: string;
 }) {
-  return (
-    <div className="p-6 sm:p-8">
-      <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-4">우리의 질문 답변</h3>
+  const half = Math.ceil(items.length / 2);
+  const leftItems = items.slice(0, half);
+  const rightItems = items.slice(half);
+
+  function renderQuestionList(list: { dq_id: number; date: string; prompt: string }[]) {
+    return (
       <ul className="space-y-4">
-        {items.map((q) => {
+        {list.map((q) => {
           const ans = db
             .prepare(`SELECT author, body FROM answers WHERE daily_question_id = ?`)
             .all(q.dq_id) as { author: "a" | "b"; body: string }[];
@@ -215,6 +230,19 @@ function QuestionsPage({
           );
         })}
       </ul>
+    );
+  }
+
+  return (
+    <div className="p-6 sm:p-8 h-full grid sm:grid-cols-2 items-start">
+      <div className="sm:pr-10">
+        <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-4">우리의 질문 답변</h3>
+        {renderQuestionList(leftItems)}
+      </div>
+      <div className="sm:pl-10 hidden sm:block">
+        <h3 className="h-display text-xl sm:text-2xl text-blossom-800 mb-4">우리의 질문 답변</h3>
+        {renderQuestionList(rightItems)}
+      </div>
     </div>
   );
 }
