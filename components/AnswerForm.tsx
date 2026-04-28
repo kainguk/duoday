@@ -18,7 +18,6 @@ export default function AnswerForm({
   const r = useRouter();
   const [body, setBody] = useState(initial);
   const [busy, setBusy] = useState(false);
-  const [saved, setSaved] = useState(initial.length > 0);
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -31,7 +30,6 @@ export default function AnswerForm({
     });
     setBusy(false);
     if (res.ok) {
-      setSaved(true);
       r.refresh();
     } else {
       alert("저장 실패");
@@ -49,7 +47,6 @@ export default function AnswerForm({
     setBusy(false);
     if (res.ok) {
       setBody("");
-      setSaved(false);
       r.refresh();
     } else {
       alert("삭제 실패");
@@ -66,7 +63,6 @@ export default function AnswerForm({
         disabled={disabled}
         onChange={(e) => {
           setBody(e.target.value);
-          setSaved(false);
         }}
       />
       <div className="flex items-center justify-between">
@@ -78,7 +74,7 @@ export default function AnswerForm({
             </button>
           ) : null}
           <button className="btn-primary" disabled={disabled || busy || !body.trim()}>
-            {saved ? "수정 저장" : "답변 저장"}
+            저장
           </button>
         </div>
       </div>

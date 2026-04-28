@@ -42,14 +42,7 @@ export default function TodayAnswerSlot({
 
           {isMine ? (
             editing ? (
-              <>
-                <AnswerForm dqId={dqId} author={author} actor={actor} initial={mine?.body ?? ""} />
-                <div className="flex justify-end">
-                  <button type="button" className="btn-ghost" onClick={() => setEditing(false)}>
-                    닫기
-                  </button>
-                </div>
-              </>
+              <AnswerForm dqId={dqId} author={author} actor={actor} initial={mine?.body ?? ""} />
             ) : (
               <div className="flex justify-end">
                 <button type="button" className="btn-ghost" onClick={() => setEditing(true)}>
