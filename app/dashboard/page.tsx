@@ -14,9 +14,22 @@ export default function DashboardPage() {
   const bestDates = (db
     .prepare(`SELECT COUNT(*) c FROM date_logs WHERE couple_id = ? AND is_best = 1`)
     .get(couple.id) as { c: number }).c;
-  const totalAnswers = (db
+  const fullyAnsweredQuestions = (db
     .prepare(
-      `SELECT COUNT(*) c FROM answers a JOIN daily_questions dq ON dq.id = a.daily_question_id WHERE dq.couple_id = ?`
+      `SELECT COUNT(*) c
+       FROM (
+         SELECT a.daily_question_id
+         FROM answers a
+         JOIN (
+           SELECT id
+           FROM daily_questions
+           WHERE couple_id = ?
+           ORDER BY date DESC, id DESC
+           LIMIT 8
+         ) latest ON latest.id = a.daily_question_id
+         GROUP BY a.daily_question_id
+         HAVING COUNT(DISTINCT a.author) = 2
+       ) done`
     )
     .get(couple.id) as { c: number }).c;
 
@@ -54,7 +67,7 @@ export default function DashboardPage() {
       <section className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Stat label="전체 데이트 기록" value={totalDates} suffix="개" href="/dates" />
         <Stat label="베스트 순간" value={bestDates} suffix="개" tone="amber" href="/dates?best=1" />
-        <Stat label="질문 답변" value={totalAnswers} suffix="개" href="/today" />
+        <Stat label="함께 답변한 질문" value={fullyAnsweredQuestions} suffix="개" href="/today" />
         <Stat
           label="가장 많이 쓴 감정"
           value={top?.c ?? 0}

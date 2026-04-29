@@ -9,11 +9,22 @@ export default function HomePage() {
   const couple = getActiveCouple();
   const q = getOrAssignTodayQuestion(couple.id, todayISO());
 
-  const answersCount = (db
+  const answeredTogetherCount = (db
     .prepare(
-      `SELECT COUNT(*) c FROM answers a
-       JOIN daily_questions dq ON dq.id = a.daily_question_id
-       WHERE dq.couple_id = ?`
+      `SELECT COUNT(*) c
+       FROM (
+         SELECT a.daily_question_id
+         FROM answers a
+         JOIN (
+           SELECT id
+           FROM daily_questions
+           WHERE couple_id = ?
+           ORDER BY date DESC, id DESC
+           LIMIT 8
+         ) latest ON latest.id = a.daily_question_id
+         GROUP BY a.daily_question_id
+         HAVING COUNT(DISTINCT a.author) = 2
+       ) done`
     )
     .get(couple.id) as { c: number }).c;
   const datesCount = (db
@@ -44,7 +55,7 @@ export default function HomePage() {
       </section>
 
       <section className="grid sm:grid-cols-3 gap-4">
-        <Stat label="함께 적은 답변" value={answersCount} suffix="개" href="/today" />
+        <Stat label="함께 답변한 질문" value={answeredTogetherCount} suffix="개" href="/today" />
         <Stat label="기록한 데이트" value={datesCount} suffix="번" href="/dates" />
         <Stat label="베스트 순간" value={bestCount} suffix="개" href="/dates?best=1" />
       </section>
