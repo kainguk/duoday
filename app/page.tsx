@@ -39,7 +39,7 @@ export default function HomePage() {
       <section className="card p-8 md:p-12 text-center">
         <p className="text-blossom-500 text-sm tracking-widest mb-3">
           D+{Math.floor((Date.now() - new Date(couple.started_on).getTime()) / 86400000)} ·{" "}
-          {couple.partner_a} & {couple.partner_b}
+          {couple.partner_a} & {couple.partner_b} · 시작일 {fmtDate(couple.started_on)}
         </p>
         <h1 className="h-display text-4xl md:text-5xl text-blossom-800 mb-4">
           오늘 우리, 어떤 하루를 보냈어?
