@@ -83,7 +83,8 @@ function seed() {
     console.log(`[seed] date_logs: ${DATES.length}`);
   }
 
-  // 질문 14일치 자동 배정 + 일부 답변 채워두기
+  // 질문 16일치 자동 배정 + 답변 분포 고정
+  // 분포: 둘 다 미작성 1개 / 지원만 작성 1개 / 도윤만 작성 1개 / 나머지 둘 다 작성
   const haveDQ = (db.prepare(`SELECT COUNT(*) c FROM daily_questions WHERE couple_id = ?`).get(coupleId) as {
     c: number;
   }).c;
@@ -91,23 +92,35 @@ function seed() {
     const total = (db.prepare(`SELECT COUNT(*) c FROM questions`).get() as { c: number }).c;
     const qs = db.prepare(`SELECT id FROM questions ORDER BY id`).all() as { id: number }[];
     const today = new Date();
+    const DAYS = 16;
     const insDQ = db.prepare(`INSERT INTO daily_questions (couple_id, date, question_id) VALUES (?,?,?)`);
     const insA = db.prepare(`INSERT OR IGNORE INTO answers (daily_question_id, author, body) VALUES (?,?,?)`);
-    for (let i = 13; i >= 0; i--) {
+    for (let i = DAYS - 1; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(today.getDate() - i);
       const iso = d.toISOString().slice(0, 10);
-      const q = qs[(13 - i) % total];
+      const idx = DAYS - 1 - i; // 0..15 (오래된 날짜 -> 최신 날짜)
+      const q = qs[idx % total];
       const r = insDQ.run(coupleId, iso, q.id);
-      if (i > 2) {
-        const dqId = Number(r.lastInsertRowid);
-        const aBody = SAMPLE_ANSWERS_A[(13 - i) % SAMPLE_ANSWERS_A.length];
-        const bBody = SAMPLE_ANSWERS_B[(13 - i) % SAMPLE_ANSWERS_B.length];
-        insA.run(dqId, "a", aBody);
-        if (i % 2 === 0) insA.run(dqId, "b", bBody);
+      const dqId = Number(r.lastInsertRowid);
+      const aBody = SAMPLE_ANSWERS_A[idx % SAMPLE_ANSWERS_A.length];
+      const bBody = SAMPLE_ANSWERS_B[idx % SAMPLE_ANSWERS_B.length];
+
+      if (idx === 0) continue; // 둘 다 미작성 1개
+      if (idx === 1) {
+        insA.run(dqId, "a", aBody); // 지원만 작성 1개
+        continue;
       }
+      if (idx === 2) {
+        insA.run(dqId, "b", bBody); // 도윤만 작성 1개
+        continue;
+      }
+
+      // 나머지는 둘 다 작성
+      insA.run(dqId, "a", aBody);
+      insA.run(dqId, "b", bBody);
     }
-    console.log("[seed] daily_questions + sample answers seeded for last 14 days");
+    console.log("[seed] daily_questions + sample answers seeded for last 16 days (fixed distribution)");
   }
 
   console.log("[seed] done");
